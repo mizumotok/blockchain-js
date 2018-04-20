@@ -19,7 +19,7 @@ describe('Block', () => {
     expect(/[0-9a-f]{64}/.test(hash)).toBe(true);
   });
 
-  it('isValid()', () => {
+  it('isValid test', () => {
     // 最小difficultyTarget
     const minDifficultyBlock = new Block(new Date(), genesis.hash(), 0, 0, []);
     expect(minDifficultyBlock.isValid()).toBe(false);
