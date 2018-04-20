@@ -49,4 +49,25 @@ describe('Blockchain', () => {
     blockchain.addBlock(newBlock);
     expect(blockchain.lastHash()).toBe(newBlock.hash());
   });
+
+  it('validChain test', () => {
+    // genesisが間違っている
+    let chain = [newBlock];
+    expect(Blockchain.isValidChain(chain)).toBe(false);
+
+    const genesis = Block.genesis();
+    chain = [genesis];
+    expect(Blockchain.isValidChain(chain)).toBe(true);
+
+    // prevHashが間違っている
+    chain = [genesis, new Block(0, 'xxx', 256, 0, [])];
+    expect(Blockchain.isValidChain(chain)).toBe(false);
+
+    // invalidなblockがある
+    chain = [genesis, new Block(0, genesis.hash(), 0, 0, [])];
+    expect(Blockchain.isValidChain(chain)).toBe(false);
+
+    chain = [genesis, newBlock];
+    expect(Blockchain.isValidChain(chain)).toBe(true);
+  });
 });

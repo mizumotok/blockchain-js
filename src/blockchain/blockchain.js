@@ -27,6 +27,28 @@ class Blockchain {
   lastHash(): string {
     return this.chain[this.chain.length - 1].hash();
   }
+
+  static isValidChain(chain: Array<Block>) {
+    if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())) {
+      return false;
+    }
+
+    let prevBlock = null;
+    return chain.every((block) => {
+      if (!prevBlock) {
+        prevBlock = block;
+        return true;
+      }
+      if (!block.isValid()) {
+        return false;
+      }
+      if (prevBlock.hash() !== block.prevHash) {
+        return false;
+      }
+      prevBlock = block;
+      return true;
+    });
+  }
 }
 
 export default Blockchain;
