@@ -1,14 +1,15 @@
 // @flow
 
 import Blockchain, { Block } from '../../blockchain';
+import { MINING_DURATION } from '../../config';
 
 describe('Blockchain', () => {
-  let blockchain;
-  let newBlock;
+  let blockchain: Blockchain;
+  let newBlock: Block;
 
   beforeEach(() => {
     blockchain = new Blockchain();
-    newBlock = new Block(new Date(), blockchain.chain[0].hash(), 256, 0, []);
+    newBlock = new Block(new Date(), blockchain.chain[0].hash(), 256, 0, [], MINING_DURATION);
   });
 
   it('初期値はgenesis blockのみ', () => {
@@ -69,5 +70,41 @@ describe('Blockchain', () => {
 
     chain = [genesis, newBlock];
     expect(Blockchain.isValidChain(chain)).toBe(true);
+  });
+
+  it('calcDifficultyTarget test', () => {
+    const difficultyTarget = 250;
+    const longMiningBlock = new Block(
+      new Date(),
+      blockchain.chain[0].hash(),
+      difficultyTarget,
+      0,
+      [],
+      MINING_DURATION * 2,
+    );
+    const chain = blockchain.chain.concat([longMiningBlock]);
+    expect(Blockchain.calcDifficultyTarget(chain)).toBe(difficultyTarget + 1);
+
+    const shortMiningBlock = new Block(
+      new Date(),
+      blockchain.chain[0].hash(),
+      difficultyTarget,
+      0,
+      [],
+      MINING_DURATION / 2,
+    );
+    chain.push(shortMiningBlock);
+    expect(Blockchain.calcDifficultyTarget(chain)).toBe(difficultyTarget - 1);
+
+    const justRightBlock = new Block(
+      new Date(),
+      blockchain.chain[0].hash(),
+      difficultyTarget,
+      0,
+      [],
+      MINING_DURATION * 1.1,
+    );
+    chain.push(justRightBlock);
+    expect(Blockchain.calcDifficultyTarget(chain)).toBe(difficultyTarget);
   });
 });

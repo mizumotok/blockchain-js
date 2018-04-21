@@ -1,6 +1,7 @@
 // @flow
 
 import Block from './block';
+import { MINING_DURATION } from '../config';
 
 class Blockchain {
   chain: Array<Block>;
@@ -26,6 +27,21 @@ class Blockchain {
 
   lastHash(): string {
     return this.chain[this.chain.length - 1].hash();
+  }
+
+  nextDifficultyTarget(): number {
+    return Blockchain.calcDifficultyTarget(this.chain);
+  }
+
+  static calcDifficultyTarget(chain: Array<Block>): number {
+    const lastBlock = chain[chain.length - 1];
+    if (lastBlock.miningDuration > MINING_DURATION * 1.2) {
+      return lastBlock.difficultyTarget + 1;
+    }
+    if (lastBlock.miningDuration < MINING_DURATION * 0.8) {
+      return lastBlock.difficultyTarget - 1;
+    }
+    return lastBlock.difficultyTarget;
   }
 
   static isValidChain(chain: Array<Block>) {

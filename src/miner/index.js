@@ -10,8 +10,9 @@ class Miner {
   }
 
   mine() {
+    const miningStartTimestamp = new Date().getTime();
     const prevHash = this.blockchain.lastHash();
-    const target = 250;
+    const target = this.blockchain.nextDifficultyTarget();
 
     let nonce = 0;
     let block;
@@ -26,6 +27,7 @@ class Miner {
         target,
         nonce,
         [],
+        timestamp - miningStartTimestamp,
       );
     } while (!block.isValid());
 
