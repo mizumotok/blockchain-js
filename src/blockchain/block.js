@@ -1,6 +1,7 @@
 // @flow
 
 import SHA256 from 'crypto-js/sha256';
+import Transaction from './transaction';
 import { DIFFICULTY_TARGET, MINING_DURATION } from '../config';
 
 class Block {
@@ -8,7 +9,7 @@ class Block {
   prevHash: string;
   difficultyTarget: number;
   nonce: number;
-  transactions: Array<any>;
+  transactions: Array<Transaction>;
   miningDuration: number;
 
   constructor(
@@ -16,7 +17,7 @@ class Block {
     prevHash: string,
     difficultyTarget: number,
     nonce: number,
-    transactions: Array<any>,
+    transactions: Array<Transaction>,
     miningDuration: number,
   ) {
     this.timestamp = timestamp;

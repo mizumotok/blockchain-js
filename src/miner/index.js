@@ -1,11 +1,13 @@
 // @flow
 
-import Blockchain, { Block } from '../blockchain';
+import Blockchain, { Block, Transaction } from '../blockchain';
 
 class Miner {
+  transactionPool: Array<Transaction>;
   blockchain: Blockchain;
 
   constructor(blockchain: Blockchain) {
+    this.transactionPool = [];
     this.blockchain = blockchain;
   }
 
@@ -26,12 +28,27 @@ class Miner {
         prevHash,
         target,
         nonce,
-        [],
+        this.transactionPool,
         timestamp - miningStartTimestamp,
       );
     } while (!block.isValid());
 
     this.blockchain.addBlock(block);
+  }
+
+  pushTransaction(tx: Transaction) {
+    if (!tx.verifyTransaction()) {
+      console.log('署名の検証に失敗しました。');
+      return;
+    }
+    this.transactionPool = this.transactionPool.filter(t => t.input.address !== tx.input.address);
+    this.transactionPool.push(tx);
+    console.log('トランザクションを追加しました。');
+  }
+
+  clearTransactions() {
+    this.transactionPool = [];
+    console.log('トランザクションを削除しました。');
   }
 }
 
