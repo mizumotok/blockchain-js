@@ -1,38 +1,36 @@
 // @flow
 
-import { ec as EC } from 'elliptic';
 import SHA256 from 'crypto-js/sha256';
-import uuidv1 from 'uuid/v1';
-import { Transaction } from '../../blockchain';
-
-const ec = new EC('secp256k1');
+import Blockchain, { Transaction } from '../../blockchain';
+import Wallet, { INITIAL_BALANCE } from '../../wallet';
 
 describe('Transaction', () => {
-  let keyPair;
-  let tx;
+  let wallet: Wallet;
+  let tx: Transaction;
   beforeEach(() => {
-    keyPair = ec.genKeyPair({ entropy: uuidv1() });
-    tx = Transaction.createTransaction(keyPair, 1000, 'recipient-address', 100);
+    const blockchain = new Blockchain();
+    wallet = new Wallet(blockchain);
+    tx = Transaction.createTransaction(wallet, 'recipient-address', 100);
   });
 
   it('createOutputs test', () => {
     // おつりあり
     expect(tx.outputs).toEqual([
       { amount: 100, address: 'recipient-address' },
-      { amount: 900, address: keyPair.getPublic().encode('hex') },
+      { amount: INITIAL_BALANCE - 100, address: wallet.publicKey },
     ]);
 
     // おつりなし
-    const tx2 = Transaction.createTransaction(keyPair, 1000, 'recipient-address', 1000);
+    const tx2 = Transaction.createTransaction(wallet, 'recipient-address', INITIAL_BALANCE);
     expect(tx2.outputs).toEqual([
-      { amount: 1000, address: 'recipient-address' },
+      { amount: INITIAL_BALANCE, address: 'recipient-address' },
     ]);
   });
 
   it('signTransaction test', () => {
     const hash = SHA256(JSON.stringify(tx.outputs)).toString();
-    expect(tx.input.address).toBe(keyPair.getPublic().encode('hex'));
-    expect(tx.input.signature).toEqual(keyPair.sign(hash));
+    expect(tx.input.address).toBe(wallet.publicKey);
+    expect(tx.input.signature).toEqual(wallet.sign(hash));
   });
 
   it('verifyTransaction test', () => {

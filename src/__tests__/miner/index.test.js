@@ -1,18 +1,17 @@
 // @flow
 
-import { ec as EC } from 'elliptic';
-import uuidv1 from 'uuid/v1';
 import Blockchain, { Transaction } from '../../blockchain';
 import Miner from '../../miner';
-
-const ec = new EC('secp256k1');
+import Wallet from '../../wallet';
 
 describe('Miner', () => {
   let blockchain;
   let miner;
+  let wallet;
 
   beforeEach(() => {
     blockchain = new Blockchain();
+    wallet = new Wallet(blockchain);
     miner = new Miner(blockchain);
   });
 
@@ -23,19 +22,18 @@ describe('Miner', () => {
   });
 
   it('pushTransaction test', () => {
-    const keyPair = ec.genKeyPair({ entropy: uuidv1() });
-    const tx = Transaction.createTransaction(keyPair, 1000, 'recipient-address', 100);
+    const tx = Transaction.createTransaction(wallet, 'recipient-address', 100);
 
     miner.pushTransaction(tx);
     expect(miner.transactionPool).toHaveLength(1);
 
     // 同じアドレス
-    const tx2 = Transaction.createTransaction(keyPair, 1000, 'recipient-address2', 200);
+    const tx2 = Transaction.createTransaction(wallet, 'recipient-address2', 200);
     miner.pushTransaction(tx2);
     expect(miner.transactionPool).toHaveLength(1);
 
     // 改ざんされたトランザクション
-    const tx3 = Transaction.createTransaction(keyPair, 1000, 'recipient-address', 300);
+    const tx3 = Transaction.createTransaction(wallet, 'recipient-address', 300);
     tx3.outputs[0].address = 'kaizansareta-address';
     miner.pushTransaction(tx3);
     expect(miner.transactionPool).toHaveLength(1);
