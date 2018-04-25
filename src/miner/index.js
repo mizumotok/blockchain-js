@@ -5,16 +5,20 @@ import Blockchain, { Block, Transaction } from '../blockchain';
 class Miner {
   transactionPool: Array<Transaction>;
   blockchain: Blockchain;
+  rewardAddress: string;
 
-  constructor(blockchain: Blockchain) {
+  constructor(blockchain: Blockchain, rewardAddress: string) {
     this.transactionPool = [];
     this.blockchain = blockchain;
+    this.rewardAddress = rewardAddress;
   }
 
   mine() {
     const miningStartTimestamp = new Date().getTime();
     const prevHash = this.blockchain.lastHash();
     const target = this.blockchain.nextDifficultyTarget();
+    const rewardTx = Transaction.rewardTransaction(this.rewardAddress);
+    this.transactionPool.push(rewardTx);
 
     let nonce = 0;
     let block;
@@ -34,6 +38,7 @@ class Miner {
     } while (!block.isValid());
 
     this.blockchain.addBlock(block);
+    this.clearTransactions();
   }
 
   pushTransaction(tx: Transaction) {
@@ -41,7 +46,8 @@ class Miner {
       console.log('署名の検証に失敗しました。');
       return;
     }
-    this.transactionPool = this.transactionPool.filter(t => t.input.address !== tx.input.address);
+    this.transactionPool =
+      this.transactionPool.filter(t => t.input && t.input.address !== tx.input.address);
     this.transactionPool.push(tx);
     console.log('トランザクションを追加しました。');
   }

@@ -12,7 +12,7 @@ describe('Miner', () => {
   beforeEach(() => {
     blockchain = new Blockchain();
     wallet = new Wallet(blockchain);
-    miner = new Miner(blockchain);
+    miner = new Miner(blockchain, wallet.publicKey);
   });
 
   it('mine test', () => {

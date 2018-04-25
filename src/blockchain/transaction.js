@@ -4,6 +4,7 @@ import uuidv1 from 'uuid/v1';
 import SHA256 from 'crypto-js/sha256';
 import { ec as EC } from 'elliptic';
 import Wallet from '../wallet';
+import { MINING_REWARD } from '../config';
 
 const ec = new EC('secp256k1');
 
@@ -23,6 +24,7 @@ class Transaction {
   id: string;
   outputs: Array<Output>;
   input: Input;
+  coinbase: ?string;
 
   createOutputs(senderWallet: Wallet, recipient: string, amount: number) {
     const balance = senderWallet.balance();
@@ -60,6 +62,20 @@ class Transaction {
     tx.id = uuidv1();
     tx.createOutputs(senderWallet, recipient, amount);
     tx.signTransaction(senderWallet);
+    return tx;
+  }
+
+  createCoinbase(recipient: string) {
+    this.outputs = [
+      { amount: MINING_REWARD, address: recipient },
+    ];
+    this.coinbase = `This is coinbase created at ${new Date().toString()}`;
+  }
+
+  static rewardTransaction(rewardAddress: string) {
+    const tx = new Transaction();
+    tx.id = uuidv1();
+    tx.createCoinbase(rewardAddress);
     return tx;
   }
 }

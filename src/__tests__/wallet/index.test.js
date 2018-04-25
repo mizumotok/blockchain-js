@@ -3,7 +3,8 @@
 import { ec as EC } from 'elliptic';
 import Blockchain, { Transaction } from '../../blockchain';
 import Miner from '../../miner';
-import Wallet, { INITIAL_BALANCE } from '../../wallet';
+import Wallet from '../../wallet';
+import { MINING_REWARD } from '../../config';
 
 const ec = new EC('secp256k1');
 
@@ -14,18 +15,20 @@ describe('Miner', () => {
 
   beforeEach(() => {
     blockchain = new Blockchain();
-    miner = new Miner(blockchain);
     wallet = new Wallet(blockchain);
+    miner = new Miner(blockchain, wallet.publicKey);
   });
 
   it('balance test', () => {
-    expect(wallet.balance()).toBe(INITIAL_BALANCE);
+    expect(wallet.balance()).toBe(0);
 
-    const tx = Transaction.createTransaction(wallet, 'recipient-address', 100);
+    miner.mine();
+    expect(wallet.balance()).toBe(MINING_REWARD);
+
+    const tx = Transaction.createTransaction(wallet, 'recipient-address', 10);
     miner.pushTransaction(tx);
     miner.mine();
-    expect(wallet.balance()).toBe(INITIAL_BALANCE - 100);
-    console.log(`残高： ${INITIAL_BALANCE - 100}`);
+    expect(wallet.balance()).toBe((MINING_REWARD * 2) - 10);
   });
 
   it('sign test', () => {

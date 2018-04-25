@@ -6,8 +6,6 @@ import Blockchain, { Transaction } from '../blockchain';
 
 const ec = new EC('secp256k1');
 
-const INITIAL_BALANCE = 1000;
-
 class Wallet {
   blockchain: Blockchain;
   keyPair: any;
@@ -38,7 +36,7 @@ class Wallet {
         o.address === this.publicKey ? a2 + o.amount : a2
       ), 0)
     ), 0);
-    return (outputs - inputs) + INITIAL_BALANCE;
+    return outputs - inputs;
   }
 
   sign(data: string) :string {
@@ -47,4 +45,3 @@ class Wallet {
 }
 
 export default Wallet;
-export { INITIAL_BALANCE };
