@@ -78,6 +78,24 @@ class Transaction {
     tx.createCoinbase(rewardAddress);
     return tx;
   }
+
+  static fromJSON(json: any): Transaction {
+    const tx = new Transaction();
+    tx.id = json.id;
+    tx.outputs = json.outputs;
+    tx.input = json.input;
+    tx.coinbase = json.coinbase;
+    return tx;
+  }
+
+  toJSON(): any {
+    return ({
+      id: this.id,
+      outputs: this.outputs,
+      input: this.input,
+      coinbase: this.coinbase,
+    });
+  }
 }
 
 export default Transaction;

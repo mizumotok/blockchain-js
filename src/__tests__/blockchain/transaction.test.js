@@ -58,4 +58,20 @@ describe('Transaction', () => {
     expect(tx.outputs[0].amount).toBe(MINING_REWARD);
     expect(tx.coinbase.length).toBeGreaterThan(1);
   });
+
+  it('toJSON test', () => {
+    const tx = Transaction.createTransaction(wallet, 'recipient-address', 10);
+    expect(tx.toJSON()).toEqual({
+      id: tx.id,
+      outputs: tx.outputs,
+      input: tx.input,
+      coinbase: tx.coinbase,
+    });
+  });
+
+  it('fromJSON test', () => {
+    const tx = Transaction.createTransaction(wallet, 'recipient-address', 10);
+    const tx2 = Transaction.fromJSON(tx.toJSON());
+    expect(tx).toEqual(tx2);
+  });
 });

@@ -28,4 +28,24 @@ describe('Block', () => {
     const maxDifficultyBlock = new Block(new Date(), genesis.hash(), 256, 0, [], 0);
     expect(maxDifficultyBlock.isValid()).toBe(true);
   });
+
+  it('toJSON test', () => {
+    const timestamp = new Date();
+    const block = new Block(timestamp, genesis.hash(), 0, 0, [], 0);
+    expect(block.toJSON()).toEqual({
+      timestamp,
+      prevHash: genesis.hash(),
+      difficultyTarget: 0,
+      nonce: 0,
+      transactions: [],
+      miningDuration: 0,
+    });
+  });
+
+  it('fromJSON test', () => {
+    const timestamp = new Date();
+    const block = new Block(timestamp, genesis.hash(), 0, 0, [], 0);
+    const block2 = Block.fromJSON(block.toJSON());
+    expect(block).toEqual(block2);
+  });
 });

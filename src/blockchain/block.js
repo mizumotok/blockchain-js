@@ -47,6 +47,30 @@ class Block {
     const hash = this.hash();
     return Number(`0x${hash}`) < 2 ** this.difficultyTarget;
   }
+
+  static fromJSON(json: any): Block {
+    const transactions = json.transactions.map(t => Transaction.fromJSON(t));
+    return new Block(
+      json.timestamp,
+      json.prevHash,
+      json.difficultyTarget,
+      json.nonce,
+      transactions,
+      json.miningDuration,
+    );
+  }
+
+  toJSON() {
+    const transactions: Array<any> = this.transactions.map(t => t.toJSON());
+    return ({
+      timestamp: this.timestamp,
+      prevHash: this.prevHash,
+      difficultyTarget: this.difficultyTarget,
+      nonce: this.nonce,
+      transactions,
+      miningDuration: this.miningDuration,
+    });
+  }
 }
 
 export default Block;
