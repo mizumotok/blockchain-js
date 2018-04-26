@@ -107,4 +107,22 @@ describe('Blockchain', () => {
     chain.push(justRightBlock);
     expect(Blockchain.calcDifficultyTarget(chain)).toBe(difficultyTarget);
   });
+
+  it('replaceChain test', () => {
+    blockchain.addBlock(newBlock);
+    const genesis = Block.genesis();
+
+    // 短いチェーンは無視
+    blockchain.replaceChain([genesis]);
+    expect(blockchain.chain).toHaveLength(2);
+
+    // 有効でないチェーンは無視
+    blockchain.replaceChain([genesis, new Block(0, 'xxx', 256, 0, [])]);
+    expect(blockchain.chain[1]).toBe(newBlock);
+
+    // 長くて有効なチェーンは置き換える
+    const newBlock2 = new Block(new Date(), newBlock.hash(), 256, 0, [], MINING_DURATION);
+    blockchain.replaceChain([genesis, newBlock, newBlock2]);
+    expect(blockchain.chain).toHaveLength(3);
+  });
 });

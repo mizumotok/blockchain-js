@@ -3,6 +3,7 @@
 import uuidv1 from 'uuid/v1';
 import { ec as EC } from 'elliptic';
 import Blockchain, { Transaction } from '../blockchain';
+import Router from '../router';
 
 const ec = new EC('secp256k1');
 
@@ -10,19 +11,22 @@ class Wallet {
   blockchain: Blockchain;
   keyPair: any;
   publicKey: string;
+  router: Router;
 
-  constructor(blockchain: Blockchain) {
+  constructor(blockchain: Blockchain, router: Router) {
     this.blockchain = blockchain;
     this.keyPair = ec.genKeyPair({ entropy: uuidv1() });
     this.publicKey = this.keyPair.getPublic().encode('hex');
+    this.router = router;
   }
 
-  createTransaction(recipient: string, amount: number): Transaction {
+  createTransaction(recipient: string, amount: number) {
     if (amount > this.balance()) {
       console.log('残高不足です。');
-      return null;
+      return;
     }
-    return Transaction.createTransaction(this, recipient, amount);
+    const tx = Transaction.createTransaction(this, recipient, amount);
+    this.router.pushTransaction(tx);
   }
 
   balance() :number {

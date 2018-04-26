@@ -4,6 +4,7 @@ import { ec as EC } from 'elliptic';
 import Blockchain, { Transaction } from '../../blockchain';
 import Miner from '../../miner';
 import Wallet from '../../wallet';
+import Router from '../../router';
 import { MINING_REWARD } from '../../config';
 
 const ec = new EC('secp256k1');
@@ -15,8 +16,9 @@ describe('Miner', () => {
 
   beforeEach(() => {
     blockchain = new Blockchain();
-    wallet = new Wallet(blockchain);
-    miner = new Miner(blockchain, wallet.publicKey);
+    const router = new Router(blockchain, false);
+    wallet = new Wallet(blockchain, router);
+    miner = new Miner(blockchain, wallet.publicKey, router);
   });
 
   it('balance test', () => {

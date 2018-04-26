@@ -3,6 +3,7 @@
 import Blockchain, { Transaction } from '../../blockchain';
 import Miner from '../../miner';
 import Wallet from '../../wallet';
+import Router from '../../router';
 
 describe('Miner', () => {
   let blockchain;
@@ -11,8 +12,9 @@ describe('Miner', () => {
 
   beforeEach(() => {
     blockchain = new Blockchain();
-    wallet = new Wallet(blockchain);
-    miner = new Miner(blockchain, wallet.publicKey);
+    const router = new Router(blockchain, false);
+    wallet = new Wallet(blockchain, router);
+    miner = new Miner(blockchain, wallet.publicKey, router);
   });
 
   it('mine test', () => {

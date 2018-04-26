@@ -1,16 +1,20 @@
 // @flow
 
 import Blockchain, { Block, Transaction } from '../blockchain';
+import Router from '../router';
 
 class Miner {
   transactionPool: Array<Transaction>;
   blockchain: Blockchain;
   rewardAddress: string;
+  router: Router;
 
-  constructor(blockchain: Blockchain, rewardAddress: string) {
+  constructor(blockchain: Blockchain, rewardAddress: string, router: Router) {
     this.transactionPool = [];
     this.blockchain = blockchain;
     this.rewardAddress = rewardAddress;
+    this.router = router;
+    this.router.subscribe(this);
   }
 
   mine() {
@@ -39,6 +43,7 @@ class Miner {
 
     this.blockchain.addBlock(block);
     this.clearTransactions();
+    this.router.mineDone();
   }
 
   pushTransaction(tx: Transaction) {

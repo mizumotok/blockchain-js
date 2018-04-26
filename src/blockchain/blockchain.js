@@ -65,6 +65,21 @@ class Blockchain {
       return true;
     });
   }
+
+  replaceChain(newChain: Array<Block>) {
+    if (newChain.length < this.chain.length) {
+      console.log('チェーンが短いため無視します。');
+      return;
+    }
+
+    if (!Blockchain.isValidChain(newChain)) {
+      console.log('チェーンが有効でないため無視します。');
+      return;
+    }
+
+    this.chain = newChain;
+    console.log('ブロックチェーンを更新しました。');
+  }
 }
 
 export default Blockchain;
